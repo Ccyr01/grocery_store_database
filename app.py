@@ -57,8 +57,22 @@ def analyze_db():
 
 
 def add_product():
-    product_name = input('Product Name: ')
-    product_quantity = input('Product Quantity: ')
+    while True:
+        product_name = input('Product Name: ').strip()
+        if len(product_name) > 0:
+            break
+        else:
+            print("Product name cannot be blank.")
+    
+    quantity_error = True
+    while quantity_error:
+        product_quantity = input('Product Quantity: ')
+        try:
+            product_quantity = int(product_quantity)
+            quantity_error = False
+        except ValueError:
+            print("Invalid quantity. Please enter a number (e.g., 12).")
+
     date_error = True
     while date_error:
         date_str = input('Date (EX: 11/1/2018): ')
@@ -67,12 +81,14 @@ def add_product():
             date_error = False
         except ValueError:
             print("Invalid date format. Please use MM/DD/YYYY (e.g., 11/1/2018).")
+
     price_error = True
     while price_error:
         price = input('Price (Ex:25.04)')
         price = clean_price(price)
         if type(price) == int:
             price_error = False
+            
     new_product = Product(product_name=product_name, product_quantity=product_quantity, date_updated=date, product_price=price)
     session.add(new_product)
     session.commit()
@@ -118,7 +134,15 @@ def backup_db():
                 brand_name
             ])
 
-    print("Backed up data base to 'backup_inventory.csv'.")
+    with open("backup_brands.csv", "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        field_names = ["brand_id", "brand_name"]
+        writer.writerow(field_names)
+        brands = session.query(Brands).all()
+        for brand in brands:
+            writer.writerow([brand.brand_id, brand.brand_name])
+
+    print("Backed up databases to 'backup_brands.csv' and 'backup_inventory.csv'.")
     time.sleep(1.5)
 
 

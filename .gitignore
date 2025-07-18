@@ -1,3 +1,4 @@
 env/
 inventory.db
 backup_inventory.csv
+backup_brands.csv
